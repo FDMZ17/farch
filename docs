@@ -1,0 +1,14 @@
+1. Keymaps
+2. Reflector mirrors
+3. Disk partitioning [Boot, Root, Home]
+4. Installing base system
+5. Localtime\Timezone
+6. Hostname
+7. Root password
+8. Grub configuration
+7. Grub target [i386-efi, x86_64-efi]
+8. Username and password for normal user
+9. Unmount all partition and reboot
+10. Boot to your archlinux machine
+
+

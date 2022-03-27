@@ -49,7 +49,10 @@ echo 'Enter the drive: '
 read driveToInstall
 cfdisk $driveToInstall
 
-echo "Please Select your file system for both boot and root: \next4\nbtrfs\nluks"
+echo "Please Select your file system for root: "
+echo "ext4"
+echo "btrfs"
+echo "luks"
 read partitionType
 
 # efi

@@ -39,7 +39,7 @@ reflector -c $mirrorsRegion -a 5 --sort rate --save /etc/pacman.d/mirrorlist
 # disk partition
 echo -ne "
 ========================================================================
-    THIS WILL FORMAT AND DELETE ALL DATA ON THE DISK
+    THIS WILL FORMAT AND DELETE ALL DATA ON THE DISK!
     Please make sure you know what you are doing because
     after formating your disk there is no way to get data back
 ========================================================================
@@ -143,6 +143,22 @@ read userNameForMainUser
 useradd -mG wheel $userNameForMainUser
 passwd $userNameForMainUser
 echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
+
+echo "Installing packages"
+pacman -S --noconfirm alsa-utils alsa-firmware sof-firmware alsa-ucm-conf dunst libnotify firefox ffmpeg mpv xorg-bdftopcf xorg-docs xorg-font-util xorg-fonts-100dpi xorg-fonts-75dpi xorg-fonts-encodings xorg-iceauth xorg-mkfontscale xorg-server xorg-server-common xorg-server-devel xorg-server-xephyr xorg-server-xnest xorg-server-xvfb xorg-sessreg xorg-setxkbmap xorg-smproxy xorg-x11perf xorg-xauth xorg-xbacklight xorg-xcmsdb xorg-xcursorgen xorg-xdpyinfo xorg-xdriinfo xorg-xev xorg-xgamma xorg-xhost xorg-xinit xorg-xinput xorg-xkbcomp xorg-xkbevd xorg-xkbutils xorg-xkill xorg-xlsatoms xorg-xlsclients xorg-xmodmap xorg-xpr xorg-xrandr xorg-xrdb xorg-xrefresh xorg-xsetroot xorg-xvinfo xorg-xwayland xorg-xwd xorg-xwininfo xorg-xwud 
+
+gpu_type=$(lspci)
+echo "Installing driver packages"
+if grep -E "NVIDIA|GeForce" <<< ${gpu_type}; then
+    pacman -S --noconfirm --needed nvidia
+	nvidia-xconfig
+elif lspci | grep 'VGA' | grep -E "Radeon|AMD"; then
+    pacman -S --noconfirm --needed xf86-video-amdgpu
+elif grep -E "Integrated Graphics Controller" <<< ${gpu_type}; then
+    pacman -S --noconfirm --needed xf86-video-intel libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+elif grep -E "Intel Corporation" <<< ${gpu_type}; then
+    pacman -S --needed --noconfirm xf86-video-intel libva-intel-driver libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa
+fi
 
 echo 'Base system installation done!'
 echo 'run umount -a && reboot'

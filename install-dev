@@ -58,7 +58,7 @@ read partitionType
 # efi
 echo 'Enter EFI partition: '
 read efiPartition
-mkfs.vfat -F 32 $efiPartition
+mkfs.fat -F32 $efiPartition
 mkdir /mnt/boot
 mount $efiPartition /mnt/boot
 

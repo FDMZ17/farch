@@ -55,18 +55,19 @@ echo "btrfs"
 echo "luks"
 read partitionType
 
+# root
+echo "Enter the root partition: "
+read rootPartition
+mkfs.$partitionType $rootPartition
+mount $rootPartition /mnt
+
+
 # efi
 echo 'Enter EFI partition: '
 read efiPartition
 mkfs.fat -F32 $efiPartition
 mkdir /mnt/boot
 mount $efiPartition /mnt/boot
-
-# root
-echo "Enter the root partition: "
-read rootPartition
-mkfs.$partitionType $rootPartition
-mount $rootPartition /mnt
 
 # home
 read -p "Did you also create home partition? [y/n]" answer

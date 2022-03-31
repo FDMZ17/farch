@@ -64,11 +64,14 @@ mount $rootPartition /mnt
 
 
 # efi
+read -p "Create efi partition? [y/n] " anwserCreateEfi
+if [[ $anwserCreateEfi = y ]]; then
 echo 'Enter EFI partition: '
 read efiPartition
 mkfs.fat -F32 $efiPartition
 mkdir /mnt/boot
 mount $efiPartition /mnt/boot
+fi
 
 # home
 read -p "Did you also create home partition? [y/n]" answer

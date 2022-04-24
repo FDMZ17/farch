@@ -74,7 +74,7 @@ fi
 
 # home
 printf '\033c'
-read -p "Did you also create home partition? [y/n]" answer
+read -p "Did you also create home partition? [y/n] " answer
 if [[ $answer = y ]] ; then
 	lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
 	echo "Enter home patition: "
@@ -103,15 +103,28 @@ sed '1,/^#installer2$/d' `basename $0` > /mnt/farch-installer2.sh
 chmod +x /mnt/farch-installer2.sh
 arch-chroot /mnt ./farch-installer2.sh
 umount -a
-echo "Rebooting in 10 second!"
-n=1
-until  [ $n -gt 10 ]
-do 
-	echo "Rebooting in $n second"
-	sleep 1
-	((n ++))
-done
-echo "Rebooting..."
+echo "Installation done!"
+echo -ne '[-] Rebooting in 10 second\r'
+sleep 1
+echo -ne '[\] Rebooting in 9 second\r'
+sleep 1
+echo -ne '[|] Rebooting in 8 second\r'
+sleep 1
+echo -ne '[/] Rebooting in 7 second\r'
+sleep 1
+echo -ne '[-] Rebooting in 6 second\r'
+sleep 1
+echo -ne '[\] Rebooting in 5 second\r'
+sleep 1
+echo -ne '[|] Rebooting in 4 second\r'
+sleep 1
+echo -ne '[/] Rebooting in 3 second\r'
+sleep 1
+echo -ne '[-] Rebooting in 2 second\r'
+sleep 1
+echo -ne '[\] Rebooting in 1 second\r'
+sleep 1
+echo -ne '[|] Rebooting!\r'
 reboot
 
 #installer2

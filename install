@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# doing some checking!
+
 if [[ -d /sys/firmware/efi ]]; then
 	echo "The system is UEFI!"
 	echo "Starting the installer..."
@@ -7,7 +9,13 @@ if [[ -d /sys/firmware/efi ]]; then
 else
 	echo "Its looks like your system is not UEFI"
 	echo "Exiting the installer..."
-	return
+	exit 1
+fi
+
+if [[ ! "${UID}" -eq 0 ]]; then
+	echo "Are you a root user?"
+	echo "Run me as root!"
+    exit 1
 fi
 
 printf '\033c'

@@ -1,5 +1,15 @@
 #!/bin/bash
 
+if [[ -d /sys/firmware/efi ]]; then
+	echo "The system is UEFI!"
+	echo "Starting the installer..."
+	sleep 2
+else
+	echo "Its looks like your system is not UEFI"
+	echo "Exiting the installer..."
+	return
+fi
+
 printf '\033c'
 
 echo -ne "
@@ -37,6 +47,7 @@ read mirrorsRegion
 reflector -c $mirrorsRegion --threads 32 --delay 2 -p https,http --sort rate --save /etc/pacman.d/mirrorlist
 
 # disk partition
+umount -a # make sure all partition are unmounted
 printf '\033c'
 echo -ne "
 ========================================================================
@@ -45,7 +56,6 @@ echo -ne "
     after formating your disk there is no way to get data back
 ========================================================================
 "
-umount -a # to make sure all partitions are unmounted
 echo "Avabile drive: $(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2" | "$3}')" 
 echo 'Enter the drive: '
 read driveToInstall

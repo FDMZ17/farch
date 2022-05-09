@@ -1,0 +1,153 @@
+#!/bin/bash
+
+# doing some checking!
+
+if [[ -d /sys/firmware/efi ]]; then
+	echo "The system is UEFI!"
+	echo "Starting the installer..."
+	sleep 2
+else
+	echo "Its looks like your system is not UEFI"
+	echo "Exiting the installer..."
+	exit 1
+fi
+
+if [[ ! "${UID}" -eq 0 ]]; then
+	echo "Are you a root user?"
+	echo "Run me as root!"
+    exit 1
+fi
+
+printf '\033c'
+
+echo -ne "
+=========================================================================================
+                                  ___                                                ___
+ _____ _____ _____ _____ _____   |  _| _____ _____ _____ _____   _ _____ _____ _____ |_  |
+|   __|  _  | __  |     |  |  |  | |  |  |  |   __|   __|     | / |   __|   __|     |  | |
+|   __|     |    -|   --|     |  | |  |  |  |   __|   __|-   -|/ /|   __|   __|-   -|  | |
+|__|  |__|__|__|__|_____|__|__|  | |_ |_____|_____|__|  |_____|_/ |_____|__|  |_____| _| |
+                                 |___|                                               |___|
+
+=========================================================================================
+                          Automated archlinux installer
+                                   [UEFI/EFI]
+
+=========================================================================================
+"
+
+#installer1
+
+sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 10/" /etc/pacman.conf
+pacman -Sy archlinux-keyring
+echo 'Enter your keymaps: '
+read keymaps
+loadkeys $keymaps
+
+# timedate
+timedatectl set-ntp true
+
+# getting the best mirrorlist
+pacman --noconfirm -Syyy
+pacman --noconfirm -S reflector
+echo 'Country name for mirrors: '
+read mirrorsRegion
+reflector -c $mirrorsRegion --threads 32 --delay 2 -p https,http --sort rate --save /etc/pacman.d/mirrorlist
+
+# disk partition
+umount -a # make sure all partition are unmounted
+printf '\033c'
+echo -ne "
+========================================================================
+    THIS WILL FORMAT AND DELETE THE DATA ON THE DISK!
+    Please make sure you know what you are doing because
+    after formating your disk there is no way to get data back
+========================================================================
+"
+echo "Avabile drive: $(lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="disk"{print "/dev/"$2" | "$3}')" 
+echo 'Enter the drive: '
+read driveToInstall
+cfdisk $driveToInstall
+
+# root
+printf '\033c'
+lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
+echo "Enter the root partition: "
+read rootPartition
+mkfs.ext4 $rootPartition
+mount $rootPartition /mnt
+
+
+# efi
+printf '\033c'
+read -p "Format/Create EFI partition? [y/n] " anwserCreateEfi
+if [[ $anwserCreateEfi = y ]]; then
+	lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
+	echo 'Enter your current EFI partition: '
+	read efiPartition
+	mkfs.fat -F32 $efiPartition
+	mkdir /mnt/boot
+	mount $efiPartition /mnt/boot
+else
+	echo "Select the partition"
+	lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
+	echo "Enter your EFI partition: "
+	read efiPart
+	mkdir /mnt/boot
+	mount $efiPart /mnt/boot
+fi
+
+# home
+printf '\033c'
+read -p "Did you also create home partition? [y/n] " answer
+if [[ $answer = y ]] ; then
+	lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
+	echo "Enter home patition: "
+	read homePartition
+	mkfs.ext4 $homePartition
+	mkdir /mnt/home
+	mount $homePartition /mnt/home
+fi
+
+cpuBrand=$(cat /proc/cpuinfo | grep 'vendor' | uniq | awk '{print $3}')
+if [[ $cpuBrand = "GenuineIntel" ]]; then
+        cpuUcode=intel-ucode
+else
+        cpuUcode=amd-ucode
+fi
+
+# installing base system
+pacstrap /mnt base-devel base linux linux-firmware vim git $cpuUcode
+
+# generate fstab
+genfstab -U /mnt >> /mnt/etc/fstab
+cat /mnt/etc/fstab
+
+# arch-chroot
+curl -so /mnt/farch-install-stage2 https://farch.fdmz17.eu.org/insall-stage2
+chmod +x /mnt/farch-install-stage2 
+arch-chroot /mnt ./farch-install-stage2
+umount -a
+echo "Installation done!"
+echo -ne '[-] Rebooting in 10 second\r'
+sleep 1
+echo -ne '[\] Rebooting in 9 second\r'
+sleep 1
+echo -ne '[|] Rebooting in 8 second\r'
+sleep 1
+echo -ne '[/] Rebooting in 7 second\r'
+sleep 1
+echo -ne '[-] Rebooting in 6 second\r'
+sleep 1
+echo -ne '[\] Rebooting in 5 second\r'
+sleep 1
+echo -ne '[|] Rebooting in 4 second\r'
+sleep 1
+echo -ne '[/] Rebooting in 3 second\r'
+sleep 1
+echo -ne '[-] Rebooting in 2 second\r'
+sleep 1
+echo -ne '[\] Rebooting in 1 second\r'
+sleep 1
+echo -ne '[|] Rebooting!\r'
+reboot

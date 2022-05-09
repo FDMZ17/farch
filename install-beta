@@ -124,7 +124,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 cat /mnt/etc/fstab
 
 # arch-chroot
-curl -so /mnt/farch-install-stage2 https://farch.fdmz17.eu.org/insall-stage2
+curl -so /mnt/farch-install-stage2 https://farch.fdmz17.eu.org/insall-beta-stage2
 chmod +x /mnt/farch-install-stage2 
 arch-chroot /mnt ./farch-install-stage2
 umount -a

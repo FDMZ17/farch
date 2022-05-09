@@ -83,15 +83,15 @@ printf '\033c'
 read -p "Format/Create EFI partition? [y/n] " anwserCreateEfi
 if [[ $anwserCreateEfi = y ]]; then
 	lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
-	echo 'Enter your current EFI partition: '
+	echo 'Enter your EFI partition: '
 	read efiPartition
 	mkfs.fat -F32 $efiPartition
 	mkdir /mnt/boot
 	mount $efiPartition /mnt/boot
-else
+else 
 	echo "Select the partition"
 	lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
-	echo "Enter your EFI partition: "
+	echo "Enter your current EFI partition: "
 	read efiPart
 	mkdir /mnt/boot
 	mount $efiPart /mnt/boot

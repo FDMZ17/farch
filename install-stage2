@@ -51,13 +51,13 @@ useradd -mG wheel $MyUsername
 passwd $MyUsername
 echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
 
-read -p "Install Xorg, alsa, firefox, mpv? [y/n]" InstallOtherPkgs
+read -p "Install Xorg, alsa, firefox, mpv? [y/n] " InstallOtherPkgs
 if [[ $InstallOtherPkgs = y ]]; then
 	echo "Installing packages"
 	pacman -S --noconfirm alsa-utils alsa-firmware sof-firmware alsa-ucm-conf dunst libnotify firefox ffmpeg mpv xorg-bdftopcf xorg-docs xorg-font-util xorg-fonts-100dpi xorg-fonts-75dpi xorg-fonts-encodings xorg-iceauth xorg-mkfontscale xorg-server xorg-server-common xorg-server-devel xorg-server-xephyr xorg-server-xnest xorg-server-xvfb xorg-sessreg xorg-setxkbmap xorg-smproxy xorg-x11perf xorg-xauth xorg-xbacklight xorg-xcmsdb xorg-xcursorgen xorg-xdpyinfo xorg-xdriinfo xorg-xev xorg-xgamma xorg-xhost xorg-xinit xorg-xinput xorg-xkbcomp xorg-xkbevd xorg-xkbutils xorg-xkill xorg-xlsatoms xorg-xlsclients xorg-xmodmap xorg-xpr xorg-xrandr xorg-xrdb xorg-xrefresh xorg-xsetroot xorg-xvinfo xorg-xwayland xorg-xwd xorg-xwininfo xorg-xwud 
 fi
 
-read -p "Install graphics driver?" installGraphicsDriver
+read -p "Install graphics driver? [y/n]: " installGraphicsDriver
 if [[ $installGraphicsDriver == y ]]; then
 	gpu_type=$(lspci)
 	echo "Installing driver packages"

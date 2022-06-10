@@ -1,4 +1,6 @@
 # FARCH [UEFI/EFI]
+> **Note**
+> UEFI/EFI ONLY!
 
 > Installing
 ```bash

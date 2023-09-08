@@ -93,8 +93,8 @@ else
 	lsblk -n --output TYPE,KNAME,SIZE | awk '$1=="part"{print "/dev/"$2" | "$3}'
 	echo "Enter your current EFI partition: "
 	read efiPart
-	mkdir /mnt/boot
-	mount $efiPart /mnt/boot
+	mkdir -p /mnt/boot/EFI
+	mount $efiPart /mnt/boot/EFI
 fi
 
 # home
